@@ -1,0 +1,5 @@
+Collecting dash-table
+  Downloading dash_table-5.0.0-py3-none-any.whl.metadata (2.4 kB)
+Downloading dash_table-5.0.0-py3-none-any.whl (3.9 kB)
+Installing collected packages: dash-table
+Successfully installed dash-table-5.0.0
