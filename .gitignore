@@ -44,8 +44,8 @@ logs/
 # MLflow
 mlruns/
 
-# Models
-models/
+# Models (trained model files, not source code)
+/models/
 
 # Environment
 .env
