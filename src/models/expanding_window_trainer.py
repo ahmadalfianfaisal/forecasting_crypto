@@ -13,8 +13,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 from prophet import Prophet
-from data_loader import download_data, prepare_prophet_df
-from model_evaluation import evaluate_model_performance, calculate_mape
+from src.utils.data_loader import download_data, prepare_prophet_df
+from src.models.model_evaluation import evaluate_model_performance, calculate_mape
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import itertools
 
@@ -344,7 +344,7 @@ def evaluate_model_performance_on_test_set(model: Prophet, train_df: pd.DataFram
         test_prop = len(test_df) / len(combined_df)
         
         # Use the existing evaluation function
-        from model_evaluation import evaluate_model_performance
+        from src.models.model_evaluation import evaluate_model_performance
         metrics = evaluate_model_performance(eval_model, combined_df, test_size=test_prop)
         
         return metrics
@@ -565,8 +565,8 @@ def train_single_model_expanding_window(ticker: str) -> bool:
         logger.info(f"Final model performance: {final_result['metrics']}")
         
         # Integrate with existing model evaluation and storage systems
-        from model_evaluation import champion_challenger_evaluation, log_model_to_mlflow, promote_model_to_production
-        from model_storage import save_model
+        from src.models.model_evaluation import champion_challenger_evaluation, log_model_to_mlflow, promote_model_to_production
+        from src.models.model_storage import save_model
         
         # Perform champion-challenger evaluation to see if this model should replace the current production model
         should_promote = champion_challenger_evaluation(ticker, final_model, historical_df)
@@ -601,7 +601,7 @@ def train_all_models_expanding_window() -> Dict[str, bool]:
     Returns:
         Dictionary mapping ticker symbols to training success status
     """
-    from data_loader import get_available_tickers
+    from src.utils.data_loader import get_available_tickers
 
     tickers = [item['value'] for item in get_available_tickers()]
     results = {}

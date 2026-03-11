@@ -6,7 +6,7 @@ from prophet import Prophet
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from typing import Tuple, Dict, Optional
 import logging
-from data_loader import prepare_prophet_df, download_data
+from src.utils.data_loader import prepare_prophet_df, download_data
 
 logger = logging.getLogger(__name__)
 
