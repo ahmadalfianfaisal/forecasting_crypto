@@ -12,14 +12,19 @@ if ! command -v tmux &> /dev/null; then
     sudo apt install -y tmux
 fi
 
-# Setup virtual environment
-if [ ! -d "venv" ]; then
-    echo "Membuat virtual environment..."
-    python3 -m venv venv
+# Setup conda environment
+CONDA_PATH="$HOME/miniconda3"
+if [ -d "$CONDA_PATH" ]; then
+    echo "Mengaktifkan conda environment..."
+    eval "$($CONDA_PATH/bin/conda shell.bash hook)"
+    conda activate forecast
+else
+    echo "Miniconda tidak ditemukan. Menggunakan venv..."
+    if [ ! -d "venv" ]; then
+        python3 -m venv venv
+    fi
+    source venv/bin/activate
 fi
-
-echo "Mengaktifkan virtual environment..."
-source venv/bin/activate
 
 if [ -f "requirements.txt" ]; then
     echo "Menginstal requirements..."
@@ -47,21 +52,28 @@ sleep 2
 
 # Buat session tmux untuk aplikasi utama
 echo "Membuat session tmux untuk aplikasi utama: $APP_SESSION"
+# Tentukan aktivasi environment
+if [ -d "$CONDA_PATH" ]; then
+    ACTIVATE_CMD="eval \"\$($CONDA_PATH/bin/conda shell.bash hook)\" && conda activate forecast"
+else
+    ACTIVATE_CMD="source venv/bin/activate"
+fi
+
 tmux new-session -d -s $APP_SESSION
-tmux send-keys -t $APP_SESSION "source venv/bin/activate" Enter
-tmux send-keys -t $APP_SESSION "python run_app.py" Enter
+tmux send-keys -t $APP_SESSION "$ACTIVATE_CMD" Enter
+tmux send-keys -t $APP_SESSION "cd ~/forecasting_crypto && python run_app.py" Enter
 
 # Buat session tmux untuk scheduler
 echo "Membuat session tmux untuk scheduler: $SCHEDULER_SESSION"
 tmux new-session -d -s $SCHEDULER_SESSION
-tmux send-keys -t $SCHEDULER_SESSION "source venv/bin/activate" Enter
-tmux send-keys -t $SCHEDULER_SESSION "python run_scheduler.py" Enter
+tmux send-keys -t $SCHEDULER_SESSION "$ACTIVATE_CMD" Enter
+tmux send-keys -t $SCHEDULER_SESSION "cd ~/forecasting_crypto && python run_scheduler.py" Enter
 
 # Buat session tmux untuk retraining otomatis
 echo "Membuat session tmux untuk retraining otomatis: $RETRAIN_SESSION"
 tmux new-session -d -s $RETRAIN_SESSION
-tmux send-keys -t $RETRAIN_SESSION "source venv/bin/activate" Enter
-tmux send-keys -t $RETRAIN_SESSION "python -c \"from src.services.scheduler_daemon import main; main()\"" Enter
+tmux send-keys -t $RETRAIN_SESSION "$ACTIVATE_CMD" Enter
+tmux send-keys -t $RETRAIN_SESSION "cd ~/forecasting_crypto && python -c \"from src.services.scheduler_daemon import main; main()\"" Enter
 
 echo ""
 echo "==========================================="
